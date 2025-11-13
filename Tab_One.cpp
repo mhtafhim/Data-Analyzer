@@ -49,6 +49,10 @@ BEGIN_MESSAGE_MAP(Tab_One, CDialogEx)
 	ON_CBN_SELCHANGE(IDC_COMBO1, &Tab_One::OnCbnSelchangeCombo1)
 	ON_CBN_SELCHANGE(IDC_COMBO2, &Tab_One::OnCbnSelchangeCombo2)
 	ON_BN_CLICKED(IDC_BUTTON1, &Tab_One::OnBnClickedButton1)
+	ON_WM_CONTEXTMENU()
+	ON_COMMAND(1, &Tab_One::OnExportGraph)
+	ON_COMMAND(2, &Tab_One::OnExportData)
+	ON_WM_RBUTTONDOWN()
 END_MESSAGE_MAP()
 
 
@@ -67,7 +71,8 @@ void Tab_One::InitChart(std::vector<CString> labels, std::vector<std::vector<dou
 	headers = labels;
 	data = rows;
 	//reset combobox values
-	showComboBoxList(0, 1);
+//	showComboBoxList(0, 1);
+	addComboBoxItems();
 
 	headersSerial.clear();
 
@@ -77,6 +82,72 @@ void Tab_One::InitChart(std::vector<CString> labels, std::vector<std::vector<dou
 		headersSerial[tmp] = i;
 	}
 }
+
+void Tab_One::addComboBoxItems()
+{
+	//reset combobox values
+	m_combo_one.ResetContent();
+	m_combo_two.ResetContent();
+	for(int i = 0; i < headers.size(); i++)
+	{
+		m_combo_one.AddString(headers[i]);
+		m_combo_two.AddString(headers[i]);
+	}
+	
+
+	//double* XVal = new double[1];
+	double* YVal = new double[1];
+
+	double XVal[] = { 103.51 ,145.856 ,160.039 ,174.425 ,188.405 ,202.588 ,226.091 ,230.346 ,258.914 ,268.234 ,282.62 };
+	//double YVal[] = { 0.812003 ,0.295188 ,0.131059 ,0.258975 ,0.299947 ,0.38009 ,1 ,0.977828 ,0.214769 ,0.283843 ,0.149118 };
+
+	RenderChart(XVal, YVal, 0, _T(""), _T(""), 0, 200, 0, 1000);
+
+
+
+}
+
+
+void Tab_One::addComboBoxItems(int first, int second)
+{
+	m_combo_one.ResetContent();
+	m_combo_two.ResetContent();
+
+	int default_one;
+	int default_two;
+	for (int i = 0; i < headers.size(); i++)
+	{
+		if (i != second) m_combo_one.AddString(headers[i]);
+		if (i != first)m_combo_two.AddString(headers[i]);
+	}
+
+	CString xName = _T("");
+	CString yName = _T("");
+
+	if (first != -1)
+	{
+		 xName = headers[first];
+		m_combo_one.SetCurSel(m_combo_one.FindStringExact(-1, xName));
+	}
+	
+	if (second != -1)
+	{
+		 yName = headers[second];
+		m_combo_two.SetCurSel(m_combo_two.FindStringExact(-1, yName));
+	}
+	
+
+	double* XVal = new double[1];
+	double* YVal = new double[1];
+
+
+	RenderChart(XVal, YVal, 0, xName, yName, 0, 200, 0, 1000);
+}
+
+
+
+CString header1, header2;
+std::vector<double> v1, v2;
 
 
 void Tab_One::showComboBoxList(int first, int second)
@@ -97,6 +168,10 @@ void Tab_One::showComboBoxList(int first, int second)
 	CString xName = headers[first];
 	CString yName = headers[second];
 
+	header1 = xName;
+	header2 = yName;
+
+
 
 	m_combo_one.SetCurSel(m_combo_one.FindStringExact(-1, xName));
 	m_combo_two.SetCurSel(m_combo_two.FindStringExact(-1, yName));
@@ -111,7 +186,9 @@ void Tab_One::showComboBoxList(int first, int second)
 	for(int i = 0; i < n; i++)
 	{
 		XVal[i] = data[i][first];
+		v1.push_back(data[i][first]);
 		YVal[i] = data[i][second];
+		v2.push_back(data[i][second]);
 		xMin = min(xMin, XVal[i]);
 		xMax = max(xMax, XVal[i]);
 		yMin = min(yMin, YVal[i]);
@@ -178,9 +255,29 @@ void Tab_One::OnCbnSelchangeCombo1()
 	int sel1 = headersSerial[tmp];
 
 	tmp = CT2A(selText_two);
+	int sel2;
+	if(headersSerial.find(tmp) == headersSerial.end())
+	{
+		sel2 = -1;
+	}
+	else
+	{
+		sel2 = headersSerial[tmp];
+	}
+	
 
-	int sel2 = headersSerial[tmp];
-	showComboBoxList(sel1, sel2);
+
+	if(sel1 == -1 || sel2 == -1)
+	{
+		addComboBoxItems(sel1, sel2);
+		return;
+	}
+	else
+	{
+		showComboBoxList(sel1, sel2);
+	}
+
+	
 	// TODO: Add your control notification handler code here
 }
 
@@ -193,12 +290,34 @@ void Tab_One::OnCbnSelchangeCombo2()
 
 	std::string tmp = CT2A(selText_one);
 
-	int sel1 = headersSerial[tmp];
+	int sel1;
+	if (headersSerial.find(tmp) == headersSerial.end())
+	{
+		sel1 = -1;
+	}
+	else
+	{
+		sel1 = headersSerial[tmp];
+	}
+
+
+	//int sel1 = headersSerial[tmp];
 
 	tmp = CT2A(selText_two);
 
 	int sel2 = headersSerial[tmp];
-	showComboBoxList(sel1, sel2);
+
+
+
+	if (sel1 == -1 || sel2 == -1)
+	{
+		addComboBoxItems(sel1, sel2);
+		return;
+	}
+	else
+	{
+		showComboBoxList(sel1, sel2);
+	}
 	// TODO: Add your control notification handler code here
 }
 
@@ -219,4 +338,90 @@ void Tab_One::OnBnClickedButton1()
 	AfxMessageBox(L"Chart exported successfully!");
 
 	// TODO: Add your control notification handler code here
+}
+
+void Tab_One::OnContextMenu(CWnd* pWnd, CPoint point)
+{
+	//Sample 01: Declarations
+	if (pWnd->GetSafeHwnd() == m_ChartCtrl.GetSafeHwnd())
+	{
+		CMenu menu;
+		menu.CreatePopupMenu();
+
+		menu.AppendMenu(MF_STRING, 1, _T("Export Graph"));
+		menu.AppendMenu(MF_STRING, 2, _T("Export Data"));
+
+		menu.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, this);
+	}
+
+
+	// TODO: Add your message handler code here
+}
+
+
+
+
+
+void Tab_One::OnExportGraph()
+{
+	OnBnClickedButton1();
+}
+
+
+void Tab_One::OnExportData()
+{
+	// File save dialog
+	CFileDialog dlg(FALSE, _T("csv"), _T("data.csv"), OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, _T("CSV Files (*.csv)|*.csv||"), this);
+	if (dlg.DoModal() != IDOK)
+		return; // User cancelled
+
+	CString path = dlg.GetPathName();
+
+	// Open file using MFC CStdioFile (simpler than std::ofstream)
+	CStdioFile file;
+	if (!file.Open(path, CFile::modeCreate | CFile::modeWrite | CFile::typeText))
+	{
+		AfxMessageBox(_T("Failed to open file!"));
+		return;
+	}
+
+	// Write headers
+	file.WriteString(header1 + _T(",") + header2 + _T("\n"));
+
+	// Write data
+	size_t n = min(v1.size(), v2.size());
+	for (size_t i = 0; i < n; ++i)
+	{
+		CString line;
+		line.Format(_T("%f,%f\n"), v1[i], v2[i]);
+		file.WriteString(line);
+	}
+
+	file.Close();
+
+	AfxMessageBox(_T("CSV file saved successfully!"));
+}
+
+
+
+
+
+
+void Tab_One::OnRButtonDown(UINT nFlags, CPoint point)
+{
+
+	// TODO: Add your message handler code here and/or call default
+	//CMenu menu;
+	//menu.CreatePopupMenu();
+
+	//menu.AppendMenu(MF_STRING, 1, _T("Export Graph"));
+	//menu.AppendMenu(MF_STRING, 2, _T("Export Data"));
+	//
+
+	//ClientToScreen(&point); // Convert client coords to screen coords
+	//menu.TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, this);
+
+	//CWnd::OnRButtonUp(nFlags, point);
+
+	CDialogEx::OnRButtonDown(nFlags, point);
 }

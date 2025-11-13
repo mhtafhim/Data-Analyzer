@@ -161,6 +161,8 @@ BEGIN_MESSAGE_MAP(CChartCtrl, CWnd)
 	ON_WM_LBUTTONUP()
 	ON_WM_LBUTTONDBLCLK()
 	ON_WM_RBUTTONDOWN()
+	ON_COMMAND(1, &CChartCtrl::OnExportGraph)
+	ON_COMMAND(2, &CChartCtrl::OnExportData)
 	ON_WM_RBUTTONUP()
 	ON_WM_RBUTTONDBLCLK()
 	ON_WM_SIZE()
@@ -881,6 +883,23 @@ void CChartCtrl::OnLButtonDblClk(UINT nFlags, CPoint point)
 	CWnd::OnLButtonDblClk(nFlags, point);
 }
 
+
+
+
+
+void CChartCtrl::OnExportGraph()
+{ 
+	AfxMessageBox(_T("Export Graph Clicked")); 
+	
+}
+
+void CChartCtrl::OnExportData() 
+{ 
+	AfxMessageBox(_T("Export Data Clicked"));
+}
+
+
+
 void CChartCtrl::OnRButtonDown(UINT nFlags, CPoint point) 
 {
 	SetCapture();
@@ -888,7 +907,10 @@ void CChartCtrl::OnRButtonDown(UINT nFlags, CPoint point)
 	if (m_bPanEnabled)
 		m_PanAnchor = point;
 
+
+
 	SendMouseEvent(CChartMouseListener::RButtonDown, point);
+
 	CWnd::OnRButtonDown(nFlags, point);
 }
 

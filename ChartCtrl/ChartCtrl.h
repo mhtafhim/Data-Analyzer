@@ -71,6 +71,8 @@ public:
 	
 	
 	void CChartCtrl::SaveChartAsImage(const CString& filePath);
+	void CChartCtrl::OnExportGraph();
+	void CChartCtrl::OnExportData();
 	/**
 		This function is used for internal purposes only
 	**/

@@ -50,7 +50,14 @@ public:
 
 	void InitChart(std::vector<CString> labels, std::vector<std::vector<double>> rows);
 
+	void addComboBoxItems();
+
+	void addComboBoxItems(int first, int second);
+
 	void showComboBoxList(int first, int second);
+
+	void Tab_One::OnExportData();
+	void Tab_One::OnExportGraph();
 
 	//void showComboBoxList(std::vector<CString> headers, std::vector<std::vector<double>> data, int first, int second);
 	std::vector<CString> headers;
@@ -65,4 +72,6 @@ public:
 	afx_msg void OnCbnSelchangeCombo2();
 	void SaveChartAsImage(const CString& filePath);
 	afx_msg void OnBnClickedButton1();
+	afx_msg void OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/);
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 };
