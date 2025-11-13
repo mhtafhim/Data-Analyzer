@@ -1,0 +1,12 @@
+# Visual Studio
+*.obj
+*.exe
+*.ilk
+*.pch
+*.pdb
+*.idb
+*.ipch/
+.vs/
+x64/Debug/
+/ChartCtrl/.svn
+/Data Analyzer/x64/Debug
